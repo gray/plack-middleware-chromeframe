@@ -7,7 +7,7 @@ use parent qw(Plack::Middleware);
 use Plack::Request;
 use Plack::Util;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION = eval $VERSION;
 
 sub call {
