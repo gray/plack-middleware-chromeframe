@@ -16,10 +16,11 @@ sub call {
     $self->response_cb($res, sub {
         my $res = shift;
 
-        return unless ($env->{HTTP_USER_AGENT} || '') =~ /MSIE/;
+        my $ua = $env->{HTTP_USER_AGENT};
+        return unless $ua and $ua =~ /MSIE/ and $ua !~ /Opera/;
 
         my $h = Plack::Util::headers($res->[1]);
-        if ($env->{HTTP_USER_AGENT} =~ /chromeframe/) {
+        if ($ua =~ /chromeframe/) {
             $h->set('X-UA-Compatible' => 'chrome=1');
         }
         else {
