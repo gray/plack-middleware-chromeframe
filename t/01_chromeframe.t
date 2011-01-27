@@ -27,6 +27,7 @@ test_psgi $app, sub {
     );
     $res = $cb->($req);
     is $res->code, 302;
+    is $res->content, '';
 
     $req->header(
         user_agent => 'Mozilla/4.0 (compatible; MSIE 7.0b; chromeframe=1)',

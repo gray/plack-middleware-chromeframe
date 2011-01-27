@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use parent qw(Plack::Middleware);
 
+use Plack::Request;
 use Plack::Util;
 
 our $VERSION = '0.01';
@@ -12,21 +13,26 @@ $VERSION = eval $VERSION;
 sub call {
     my ($self, $env) = @_;
 
-    my $res = $self->app->($env);
-    $self->response_cb($res, sub {
-        my $res = shift;
+    my $req = Plack::Request->new($env);
+    my $ua  = $req->user_agent;
 
-        my $ua = $env->{HTTP_USER_AGENT};
-        return unless $ua and $ua =~ /MSIE/ and $ua !~ /Opera/;
-
-        my $h = Plack::Util::headers($res->[1]);
+    my $chromeframe = 0;
+    if ($ua and $ua =~ /MSIE/ and $ua !~ /Opera/) {
         if ($ua =~ /chromeframe/) {
-            $h->set('X-UA-Compatible' => 'chrome=1');
+            $chromeframe = 1;
         }
         else {
-            $h->set(Location => 'http://www.google.com/chromeframe');
-            $res->[0] = 302;
+            my $res = $req->new_response;
+            $res->redirect('http://www.google.com/chromeframe');
+            return $res->finalize;
         }
+    }
+
+    my $res = $self->app->($env);
+    $self->response_cb($res, sub {
+        return unless $chromeframe;
+        my $h = Plack::Util::headers($_[0]->[1]);
+        $h->set('X-UA-Compatible' => 'chrome=1');
     });
 }
 
@@ -41,7 +47,7 @@ Plack::Middleware::ChromeFrame - injects Google Chrome Frame into IE
 
 =head1 SYNOPSIS
 
-    # in  app.psgi
+    # in app.psgi
     builder {
         enable 'ChromeFrame';
         $app;
