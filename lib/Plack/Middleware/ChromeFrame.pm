@@ -18,7 +18,7 @@ sub call {
 
     my $chromeframe = 0;
     if ($ua and $ua =~ /MSIE/ and $ua !~ /Opera/) {
-        if ($ua =~ /chromeframe/) {
+        if ($ua =~ m[chromeframe/]) {
             $chromeframe = 1;
         }
         else {

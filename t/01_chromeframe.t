@@ -30,7 +30,7 @@ test_psgi $app, sub {
     is $res->content, '';
 
     $req->header(
-        user_agent => 'Mozilla/4.0 (compatible; MSIE 7.0b; chromeframe=1)',
+        user_agent => 'Mozilla/4.0 (compatible; MSIE 7.0b; chromeframe/8xx)',
     );
     $res = $cb->($req);
     is $res->code, 200;
